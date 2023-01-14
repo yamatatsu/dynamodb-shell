@@ -1,0 +1,22 @@
+{
+  "name": "dynamodb-script",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "tsc && pkg src/index.js --target node18-macos-arm64 --output dist/dynamodb-script",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "pkg": "^5.8.0",
+    "prettier": "^2.8.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.4",
+    "vitest": "^0.27.1"
+  }
+}
