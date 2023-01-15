@@ -5,6 +5,8 @@
 - [x] [usecase] autocomplete table name
 - [ ] test
 - [ ] [usecase] save item
+- [ ] [usecase] use profile
+- [ ] [usecase] copy
 
 ```js
 .region us-east-1
