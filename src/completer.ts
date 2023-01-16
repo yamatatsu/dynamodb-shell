@@ -5,9 +5,9 @@ export default class Completer {
 
   public complete(line: string): CompleterResult {
     if (line.startsWith(".")) {
-      const completions = [".exit", ".region", ".hoge"];
-      const hits = completions.filter((c) => c.startsWith(line));
-      return [hits.length ? hits : completions, line];
+      const completions = [".exit", ".region"];
+      const candidates = completions.filter((c) => c.startsWith(line));
+      return [candidates.length ? candidates : completions, line];
     }
 
     if (
@@ -18,22 +18,23 @@ export default class Completer {
       return [['db["#meta"]'], line];
     }
 
-    if (line.startsWith("db[") || line.startsWith("db[")) {
-      const [, subTableName] = line.match(/^db\[['"]?([a-zA-Z0-9_.-]*)/) ?? [];
-      const hits = this.tables.filter((c) => c.startsWith(subTableName));
-      const candidates = hits.map((table) => `db["${table}"]`);
-      return [candidates, line];
-    }
-
-    if (line.startsWith("db.")) {
-      const [, subTableName] = line.match(/^db\.([a-zA-Z0-9_.-]*)/) ?? [];
+    const [, , subTableName] =
+      line.match(/^db(\.|\[['"]?)([a-zA-Z0-9_.-]*)/) ?? [];
+    if (subTableName != null) {
       const hits = this.tables.filter((c) => c.startsWith(subTableName));
       const candidates = hits.map((table) =>
-        /[a-zA-Z_][[a-zA-Z0-9_]*]/.test(table)
+        /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(table)
           ? `db.${table}`
           : `db["${table}"]`
       );
-      return [candidates, line];
+      return [
+        (hits.length ? hits : this.tables).map((table) =>
+          /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(table)
+            ? `db.${table}`
+            : `db["${table}"]`
+        ),
+        line,
+      ];
     }
 
     return [[], line];
