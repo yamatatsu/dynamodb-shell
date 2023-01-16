@@ -1,28 +1,19 @@
 import { IDynamodb } from "../dynamodb";
 import Table from "./table";
 
+type IDB = {
+  "#meta": { tableNames: string[] };
+} & { [tableName: string]: Table };
+
 export default async function createDB(dynamodb: IDynamodb) {
   const tableNames = await dynamodb.listTables();
-  const tables = tableNames.reduce<{ [tableName: string]: Table }>(
+  const db = tableNames.reduce(
     (acc, name) => {
       acc[name] = new Table(dynamodb, name);
       return acc;
     },
-    {}
+    { "#meta": { tableNames } } as IDB
   );
 
-  return {
-    get tables() {
-      return tables;
-    },
-    get t() {
-      return tables;
-    },
-    get tableNames() {
-      return tableNames;
-    },
-    get tn() {
-      return tableNames;
-    },
-  };
+  return db;
 }

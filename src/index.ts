@@ -29,14 +29,14 @@ async function startREPL() {
 
     server.setPrompt(getPrompt(_region));
     server.context.db = db;
-    completer.setTables(db.tableNames);
+    completer.setTables(db["#meta"].tableNames);
 
     server.displayPrompt();
   });
 
   const db = await createDB(dynamodb);
   server.context.db = db;
-  completer.setTables(db.tableNames);
+  completer.setTables(db["#meta"].tableNames);
 }
 
 function getPrompt(region: string) {
