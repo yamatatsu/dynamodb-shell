@@ -33,3 +33,17 @@ device1;
 device1.save();
 // { result: "success" }
 ```
+
+## Development
+
+```
+pnpm i
+```
+
+```
+pnpm start
+```
+
+```
+pnpm build
+```
