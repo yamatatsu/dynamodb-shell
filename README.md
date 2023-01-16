@@ -7,6 +7,8 @@
 - [ ] [usecase] save item
 - [ ] [usecase] use profile
 - [ ] [usecase] copy
+- [ ] [usecase] save global var
+- [ ] [usecase] update item
 
 ```js
 .region us-east-1
