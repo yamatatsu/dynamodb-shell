@@ -28,7 +28,7 @@ export default class Table {
   private async setupKeyName() {
     const tableInfo = await this.dynamodb.describeTable(this.tableName);
     const pkName = tableInfo.KeySchema?.[0].AttributeName;
-    const skName = tableInfo.KeySchema?.[1].AttributeName;
+    const skName = tableInfo.KeySchema?.[1]?.AttributeName;
 
     if (!pkName) {
       throw new Error("No PrimaryKey Info was responded.");
