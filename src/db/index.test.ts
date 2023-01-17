@@ -1,15 +1,27 @@
-import Dynamodb from "../dynamodb";
+import { IDynamodb } from "../dynamodb";
 import createDB from "./";
 
-jest.mock("../dynamodb");
-const DynamodbMock = Dynamodb as jest.Mock;
+const mockListTables = jest.fn();
+const mockDescribeTable = jest.fn();
+const mockScan = jest.fn();
+const mockGet = jest.fn();
+const mockDynamodb = jest.fn<IDynamodb, any[]>().mockImplementation(() => {
+  return {
+    listTables: mockListTables,
+    describeTable: mockDescribeTable,
+    scan: mockScan,
+    get: mockGet,
+  };
+});
 
-const mockedDynamodbBase = {
-  async listTables() {
-    return ["user"];
-  },
-  async describeTable() {
-    return {
+beforeEach(() => {
+  mockListTables.mockClear();
+  mockDescribeTable.mockClear();
+  mockScan.mockClear();
+  mockGet.mockClear();
+  mockListTables.mockReturnValue(Promise.resolve(["user"]));
+  mockDescribeTable.mockReturnValue(
+    Promise.resolve({
       AttributeDefinitions: [
         { AttributeName: "pk", AttributeType: "S" },
         { AttributeName: "sk", AttributeType: "S" },
@@ -30,28 +42,23 @@ const mockedDynamodbBase = {
       ItemCount: 1,
       TableArn: "arn:aws:dynamodb:us-east-1:123456789012:table/user",
       TableId: "F307A7E8-597F-4A56-9E1D-30DAF37890CB",
-    };
-  },
-  async scan() {
-    return [
+    })
+  );
+  mockScan.mockReturnValue(
+    Promise.resolve([
       { pk: "userId:1", sk: "user", name: "foo" },
       { pk: "userId:1", sk: "room:1", color: "green" },
       { pk: "userId:1", sk: "room:2", color: "blue" },
-    ];
-  },
-  async get() {
-    return { pk: "userId:1", sk: "user", name: "foo" };
-  },
-};
-
-beforeEach(() => {
-  DynamodbMock.mockClear();
-  DynamodbMock.mockImplementation(() => mockedDynamodbBase);
+    ])
+  );
+  mockGet.mockReturnValue(
+    Promise.resolve({ pk: "userId:1", sk: "user", name: "foo" })
+  );
 });
 
 describe("scan()", () => {
   test("response items", async () => {
-    const db = await createDB(new Dynamodb());
+    const db = await createDB(mockDynamodb());
     const users = await db.user.scan();
     expect(users).toEqual([
       { pk: "userId:1", sk: "user", name: "foo" },
@@ -63,27 +70,16 @@ describe("scan()", () => {
 
 describe("get()", () => {
   test("response an item", async () => {
-    const db = await createDB(new Dynamodb());
+    const db = await createDB(mockDynamodb());
     const users = await db.user.get("userId:1", "user");
     expect(users).toEqual({ pk: "userId:1", sk: "user", name: "foo" });
 
-    // expect(DynamodbMock.mock.instances[0].get).toBeCalledWith({
-    //   TableName: "user",
-    //   pk: "userId:1",
-    //   sk: "user",
-    // });
+    expect(mockGet).toBeCalledWith("user", { pk: "userId:1", sk: "user" });
   });
 
   test("throw error if no table description was got", async () => {
-    DynamodbMock.mockImplementation(() => {
-      return {
-        ...mockedDynamodbBase,
-        async describeTable() {
-          return {};
-        },
-      };
-    });
-    const db = await createDB(new Dynamodb());
+    mockDescribeTable.mockReturnValue(() => ({}));
+    const db = await createDB(mockDynamodb());
 
     await expect(db.user.get(1)).rejects.toThrow(
       "No PrimaryKey Info was responded."
