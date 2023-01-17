@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "build": "tsc && pkg pre-dist/index.js --target node18-macos-arm64 --output dist/dynamodb-shell",
+    "start": "ts-node src/main.ts",
+    "build": "rm -rf pre-dist dist && tsc && pkg pre-dist/main.js --target node18-macos-arm64 --output dist/dynamodb-shell",
     "test": "jest"
   },
   "author": "",
