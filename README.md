@@ -3,7 +3,7 @@
 - [x] [usecase] scan items
 - [x] [usecase] get item
 - [x] [usecase] autocomplete table name
-- [ ] test
+- [x] test
 - [ ] [usecase] save item
 - [ ] [usecase] use profile
 - [ ] [usecase] copy

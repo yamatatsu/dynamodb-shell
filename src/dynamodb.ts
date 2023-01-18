@@ -1,7 +1,8 @@
 import {
-  DescribeTableCommand,
   DynamoDBClient,
+  DynamoDBClientConfig,
   ListTablesCommand,
+  DescribeTableCommand,
   TableDescription,
 } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
@@ -20,8 +21,8 @@ export default class Dynamodb implements IDynamodb {
   private readonly client: DynamoDBClient;
   private readonly document: DynamoDBDocument;
 
-  constructor(region?: string) {
-    this.client = new DynamoDBClient({ region });
+  constructor(config: DynamoDBClientConfig = {}) {
+    this.client = new DynamoDBClient(config);
     this.document = DynamoDBDocument.from(this.client);
   }
 

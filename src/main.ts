@@ -24,7 +24,7 @@ async function startREPL() {
       return;
     }
 
-    const dynamodb = new Dynamodb(_region);
+    const dynamodb = new Dynamodb({ region: _region });
     const db = await createDB(dynamodb);
 
     server.setPrompt(getPrompt(_region));
