@@ -21,8 +21,9 @@ describe("scan()", () => {
 describe("get()", () => {
   test("response an item", async () => {
     const db = await createDB(dynamodb);
-    const users = await db.users.get("userId:1", "user");
-    expect(users).toEqual({ pk: "userId:1", sk: "user", name: "foo" });
+    const item = db.users.get("userId:1", "user");
+    await item.attributesPromise;
+    expect(item.show()).toEqual({ pk: "userId:1", sk: "user", name: "foo" });
   });
 
   test("throw error if no table description was got", async () => {
@@ -34,8 +35,9 @@ describe("get()", () => {
 
     const db = await createDB(dynamodb);
 
-    await expect(db.users.get(1)).rejects.toThrow(
-      "No PrimaryKey Info was responded."
-    );
+    const item = db.users.get(1);
+    await item.attributesPromise;
+
+    expect(item.show()).toThrow("No PrimaryKey Info was responded.");
   });
 });

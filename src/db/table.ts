@@ -1,4 +1,5 @@
 import { IDynamodb } from "../dynamodb";
+import Item from "./item";
 
 export default class Table {
   private pkName: string | null = null;
@@ -13,16 +14,14 @@ export default class Table {
     return this.dynamodb.scan(this.tableName);
   }
 
-  public async get(
-    pk: string | number,
-    sk?: string | number
-  ): Promise<object | null> {
-    if (!this.pkName) {
-      await this.setupKeyName();
-    }
-    const keys = { [this.pkName!]: pk };
-    if (this.skName && sk) keys[this.skName] = sk;
-    return this.dynamodb.get(this.tableName, keys);
+  public get(pk: string | number, sk?: string | number): Item {
+    return new Item(
+      (this.pkName ? Promise.resolve() : this.setupKeyName()).then(() => {
+        const keys = { [this.pkName!]: pk };
+        if (this.skName && sk) keys[this.skName] = sk;
+        return this.dynamodb.get(this.tableName, keys);
+      })
+    );
   }
 
   private async setupKeyName() {
